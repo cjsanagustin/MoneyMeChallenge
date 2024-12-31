@@ -1,0 +1,30 @@
+﻿@inject NavigationManager navManager
+
+<MudDialog Style="background-color:whitesmoke">
+    <DialogContent>
+        <MudText>@Content</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Disabled=@ClickButtonState Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Check" OnClick="@ExecuteEvent">@ButtonText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = new MudDialogInstance();
+    [Parameter] public string ButtonText { get; set; } = "";
+    [Parameter] public string Content { get; set; } = "Are you sure you want to proceed?";
+    [Parameter] public EventCallback EventParameter { get; set; }
+
+    private bool ClickButtonState = false;
+
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task ExecuteEvent()
+    {
+        ClickButtonState = true;
+        await EventParameter.InvokeAsync();
+        MudDialog.Cancel();
+        ClickButtonState = false;
+    }
+}

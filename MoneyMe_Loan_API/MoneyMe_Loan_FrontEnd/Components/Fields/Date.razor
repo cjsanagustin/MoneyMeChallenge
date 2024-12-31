@@ -1,0 +1,77 @@
+﻿@using System.Linq.Expressions
+@using MoneyMe_Loan_FrontEnd.Components.Wrapper
+
+<RMudItem GridWidth="GridWidth" Class="@RMudItemClass" Style="@RMudItemStyle">
+    <MudDatePicker Required="@Required" Class="@Class" HelperText="@HelperText" Label="@Label" Clearable="Clearable" ShowToolbar="true" @bind-Date="Value"
+                   Margin="Margin.Dense" Editable="true" Placeholder="MM/dd/yyyy"
+                   Variant="ReadonlyVariant"
+                   PickerVariant="PickerVariant.Dialog"
+                   DateFormat="MM/dd/yyyy" ReadOnly="@ReadOnly" For="@For" />
+</RMudItem>
+
+@code {
+    [Parameter]
+    public string Class { get; set; } = "";
+
+    [Parameter]
+    public string HelperText { get; set; } = "";
+
+    [Parameter]
+    public string RMudItemClass { get; set; } = "pa-1";
+
+    [Parameter]
+    public string RMudItemStyle { get; set; } = "";
+
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public bool Required { get; set; } = false;
+
+    [Parameter]
+    public bool Clearable { get; set; } = false;
+
+    [Parameter]
+    public bool ReadOnly { get; set; } = false;
+
+    [Parameter]
+    public Expression<System.Func<DateTime?>>? For { get; set; }
+
+    [Parameter]
+    public RMudItem.Grid GridWidth { get; set; } = RMudItem.Grid.Whole;
+
+    private DateTime? _value = DateTime.Today;
+
+    private Variant ReadonlyVariant
+    {
+        get
+        {
+            return ReadOnly ? Variant.Filled : Variant.Outlined;
+        }
+    }
+
+#pragma warning disable BL0007
+    [Parameter]
+    public DateTime? Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            _value = value;
+
+            // Set value to null if value is equal to MinValue, this is for non-nullable fields
+            if (_value == DateTime.MinValue) {
+                _value = null; 
+            }
+
+            ValueChanged.InvokeAsync(value);
+        }
+    }
+#pragma warning disable BL0007
+
+    [Parameter]
+    public EventCallback<DateTime?> ValueChanged { get; set; }
+
+
+}

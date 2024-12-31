@@ -1,0 +1,62 @@
+﻿@using System.Linq.Expressions
+@using MoneyMe_Loan_FrontEnd.Components.Wrapper
+<RMudItem GridWidth="@GridWidth" Class="@RMudItemClass" Style="@RMudItemStyle">
+    <MudSelect Class="@Class" Required="@Required" Dense="true" Margin="Margin.Dense" T="string" Label="Title" Clearable="Clearable"
+               Placeholder="--" @bind-Value="Value" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" For="@For">
+        @if (!string.IsNullOrEmpty(Label))
+        {
+        <MudSelectItem Value="string.Empty">@Label</MudSelectItem>
+        }
+        <MudSelectItem Value="@("Mr.")">Mr.</MudSelectItem>
+        <MudSelectItem Value="@("Ms.")">Ms.</MudSelectItem>
+        <MudSelectItem Value="@("Mrs.")">Mrs.</MudSelectItem>
+        <MudSelectItem Value="@("Other")">Other</MudSelectItem>
+    </MudSelect>
+</RMudItem>
+
+@code {
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public bool Clearable { get; set; } = false;
+
+    [Parameter]
+    public RMudItem.Grid GridWidth { get; set; } = RMudItem.Grid.Whole;
+
+    [Parameter]
+    public string RMudItemClass { get; set; } = "pa-1";
+
+    [Parameter]
+    public string RMudItemStyle { get; set; } = "";
+
+    [Parameter]
+    public Expression<System.Func<string>>? For { get; set; }
+
+    private string _value = "";
+
+#pragma warning disable BL0007
+    [Parameter]
+    public string Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            _value = value;
+            ValueChanged.InvokeAsync(value);
+        }
+    }
+#pragma warning disable BL0007
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+}

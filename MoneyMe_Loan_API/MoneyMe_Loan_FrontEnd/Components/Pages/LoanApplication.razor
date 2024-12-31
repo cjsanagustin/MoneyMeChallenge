@@ -1,0 +1,65 @@
+﻿@page "/LoanApplication/{URLGUID}"
+@using MoneyMe_Loan_FrontEnd.DTOs
+@using MoneyMe_Loan_FrontEnd.Shared
+@using System.Globalization
+@inject IConfiguration _Configuration;
+@inject ApiService ApiService
+
+
+@if (ShowCalculator)
+{
+    <QuoteCalculator URLGUID="@URLGUID" SystemConfigurations="@systemConfigurations" @bind-IsVisible="ShowCalculator" @bind-Model="Model"></QuoteCalculator>
+}
+else
+{
+    <YourQuote URLGUID="@URLGUID" @bind-IsVisible="ShowCalculator" @bind-Model="Model"></YourQuote>
+}
+
+@code {
+
+    private LoanApplicationApplyDto Model = new LoanApplicationApplyDto();
+    private SystemConfigurationDto? systemConfigurations = new SystemConfigurationDto();
+    private LoanApplicationPrePopulatedDto? prePopulated = new LoanApplicationPrePopulatedDto();
+
+    [Parameter]
+    public string? URLGUID { get; set; }
+
+    private bool ShowCalculator = true;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            string BaseAPIURL = _Configuration.GetSection("APIURL").Value ?? "";
+
+            string SystemConfigURL = string.Concat(BaseAPIURL, "/api/SystemConfiguration/GetAll");
+            systemConfigurations = await ApiService.Get<SystemConfigurationDto>(SystemConfigURL);
+
+            string GetByURL = string.Concat(BaseAPIURL, $"/api/money-me-loan-application/{(URLGUID ?? "")}");
+            prePopulated = await ApiService.Get<LoanApplicationPrePopulatedDto>(GetByURL);
+
+            if (prePopulated != null && systemConfigurations != null)
+            {
+
+                Model.CustomerId = prePopulated.CustomerId;
+                Model.FirstName = prePopulated.FirstName;
+                Model.LastName = prePopulated.LastName;
+
+                DateTime.TryParseExact(prePopulated.DateOfBirth ?? "", Utilities.DateParseFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate);
+                Model.DateOfBirth = parsedDate.Date;
+
+                Model.MobileNumber = prePopulated.MobileNumber;
+
+                Model.Title = prePopulated.Title;
+                Model.Email = prePopulated.Email;
+
+                Model.Amount = prePopulated.AmountRequired;
+                Model.MonthlyTerm = prePopulated.MonthlyTerm;
+                Model.EstablishmentFee = systemConfigurations.EstablishmentFee;
+            }
+
+            StateHasChanged();
+        }
+    }
+}

@@ -1,0 +1,57 @@
+﻿@using System.Linq.Expressions
+@using MoneyMe_Loan_FrontEnd.Components.Wrapper
+
+<RMudItem GridWidth="@GridWidth" Class="@RMudItemClass" Style="@RMudItemStyle">
+    <MudSlider @bind-Value="Value" Step="@Step" ValueLabel="true" Min="@Min" Max="@Max" Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large"></MudSlider>
+</RMudItem>
+
+@code {
+    [Parameter]
+    public int Step { get; set; } = 1;
+    
+    [Parameter]
+    public int Min { get; set; } = 1;
+
+    [Parameter]
+    public int Max { get; set; } = 1;
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
+    [Parameter]
+    public string RMudItemClass { get; set; } = "pa-1";
+
+    [Parameter]
+    public string RMudItemStyle { get; set; } = "";
+
+    [Parameter]
+    public string Style { get; set; } = "";
+
+    [Parameter]
+    public RMudItem.Grid GridWidth { get; set; } = RMudItem.Grid.Whole;
+
+    [Parameter]
+    public bool Clearable { get; set; } = false;
+
+    private int _value = 0;
+
+#pragma warning disable BL0007
+    [Parameter]
+    public int Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            {
+                _value = value;
+                ValueChanged.InvokeAsync(value);
+            }
+        }
+    }
+#pragma warning disable BL0007
+
+    [Parameter]
+    public EventCallback<int> ValueChanged { get; set; }
+
+}

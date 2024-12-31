@@ -1,0 +1,59 @@
+﻿@using System.Linq.Expressions
+@using MoneyMe_Loan_FrontEnd.Components.Wrapper
+@using System.Globalization
+
+<RMudItem GridWidth="@GridWidth" Class="@RMudItemClass" Style="@RMudItemStyle">
+    <MudSlider T="decimal" @bind-Value="Value" Step="@Step" ValueLabel="true" Culture="@CultureInfo.GetCultureInfo("en-US")" ValueLabelFormat="C" Min="@Min" Max="@Max"
+               Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large"></MudSlider>
+</RMudItem>
+
+@code {
+    [Parameter]
+    public decimal Step { get; set; } = 1;
+
+    [Parameter]
+    public decimal Min { get; set; } = 1;
+
+    [Parameter]
+    public decimal Max { get; set; } = 1;
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
+    [Parameter]
+    public string RMudItemClass { get; set; } = "pa-1";
+
+    [Parameter]
+    public string RMudItemStyle { get; set; } = "";
+
+    [Parameter]
+    public string Style { get; set; } = "";
+
+    [Parameter]
+    public RMudItem.Grid GridWidth { get; set; } = RMudItem.Grid.Whole;
+
+    [Parameter]
+    public bool Clearable { get; set; } = false;
+
+    private decimal _value = 0;
+
+#pragma warning disable BL0007
+    [Parameter]
+    public decimal Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            {
+                _value = value;
+                ValueChanged.InvokeAsync(value);
+            }
+        }
+    }
+#pragma warning disable BL0007
+
+    [Parameter]
+    public EventCallback<decimal> ValueChanged { get; set; }
+
+}

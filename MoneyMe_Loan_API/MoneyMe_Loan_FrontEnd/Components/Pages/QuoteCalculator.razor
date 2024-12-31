@@ -1,0 +1,174 @@
+﻿@using MoneyMe_Loan_FrontEnd.Components.Dialog
+@using MoneyMe_Loan_FrontEnd.Components.Dropdown
+@using MoneyMe_Loan_FrontEnd.Components.Fields
+@using MoneyMe_Loan_FrontEnd.Components.Wrapper
+@using MoneyMe_Loan_FrontEnd.DTOs
+@using MoneyMe_Loan_FrontEnd.Shared
+@using System.Globalization
+@inject ApiService ApiService
+@inject ISnackbar Snackbar
+@inject IConfiguration _Configuration;
+@inject IDialogService DialogService
+
+<PageTitle>Quote Calculator</PageTitle>
+<div style="width:100%">
+    <MudGrid Justify="Justify.Center" Spacing="1">
+        <RMudItem Class="mud-elevation-2 pa-3 px-10" GridWidth="RMudItem.Grid.OneThird">
+            @if (SystemConfigurations != null)
+            {
+                <MudForm Model="@Model" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0" Class="pa-1 ma-1">
+                    <MudGrid Justify="Justify.FlexStart" Spacing="1">
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp">
+                            <MudText Align="Align.Center" Typo="Typo.h4" Style="font-weight:700">Quote Calculator</MudText>
+                        </RMudItem>
+
+                        <Product @bind-Value="@Model.ProductId" ValueChangedEvent="@EventCallback.Factory.Create(this, SetProduct)" Clearable="true" Required="true" GridWidth="RMudItem.Grid.PopUp" />
+
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-5">
+                            <MudGrid Class="ma-0" Style="width:100%">
+                                <SliderAmount @bind-Value="@Model.Amount" Step="100m" Min="@SystemConfigurations.LoanAmountSliderMin" Max="@SystemConfigurations.LoanAmountSliderMax"
+                                              Clearable="true" GridWidth="RMudItem.Grid.PopUp" />
+                                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                                    <div class="d-flex justify-space-between">
+                                        <MudText>@Utilities.GetDecimalFormat(SystemConfigurations.LoanAmountSliderMin)</MudText>
+                                        <MudText>How much do you need?</MudText>
+                                        <MudText>@Utilities.GetDecimalFormat(SystemConfigurations.LoanAmountSliderMax)</MudText>
+                                    </div>
+                                </RMudItem>
+                            </MudGrid>
+                        </RMudItem>
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-5">
+                            <MudGrid Class="ma-0" Style="width:100%">
+                                <Slider @bind-Value="@Model.MonthlyTerm" Min="@SystemConfigurations.TermSliderMinMonths" Max="@SystemConfigurations.TermSliderMaxMonths"
+                                        Clearable="true" GridWidth="RMudItem.Grid.PopUp" />
+                                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                                    <div class="d-flex justify-space-between">
+                                        <MudText>@SystemConfigurations.TermSliderMinMonths <MudText Typo="Typo.caption">@(SystemConfigurations.TermSliderMinMonths == 1 ? "Month" : "Months")</MudText></MudText>
+                                        <MudText>@SystemConfigurations.TermSliderMaxMonths <MudText Typo="Typo.caption">Months</MudText></MudText>
+                                    </div>
+                                </RMudItem>
+                            </MudGrid>
+                        </RMudItem>
+
+                        <Title @bind-Value="@Model.Title" Clearable="true" Required="true" For="@(() => Model.Title)" GridWidth="RMudItem.Grid.OneHalf" />
+                        <Text Label="First Name" @bind-Value="@Model.FirstName" Required="true" For="@(() => Model.FirstName)" GridWidth="RMudItem.Grid.OneHalf" />
+                        <Text Label="Last Name" @bind-Value="@Model.LastName" Required="true" For="@(() => Model.LastName)" GridWidth="RMudItem.Grid.OneHalf" />
+                        <Text Label="Email" @bind-Value="@Model.Email" Required="true" For="@(() => Model.Email)" GridWidth="RMudItem.Grid.OneHalf" />
+                        <Text Label="Mobile number" @bind-Value="@Model.MobileNumber" Required="true" For="@(() => Model.MobileNumber)" GridWidth="RMudItem.Grid.OneHalf" />
+                        <Date Label="Date of Birth" @bind-Value="@Model.DateOfBirth" Clearable="true" Required="true" For="@(() => Model.DateOfBirth)" GridWidth="RMudItem.Grid.OneHalf" />
+
+                        <LoanType @bind-Value="@Model.LoanTypeId" Clearable="true" Required="true" GridWidth="RMudItem.Grid.PopUp" />
+
+                        <RMudItem Class="d-flex justify-center" GridWidth="RMudItem.Grid.PopUp">
+                            <MudButton Class="button-shadow my-5 px-15" OnClick="@(() => CalculateQuote())" Variant="Variant.Filled" Color="Color.Secondary">
+                                Calculate quote
+                            </MudButton>
+                        </RMudItem>
+
+                        <RMudItem Class="d-flex justify-center" GridWidth="RMudItem.Grid.PopUp">
+                            <MudText Typo="Typo.caption">Quote does not affect your credit score</MudText>
+                        </RMudItem>
+                    </MudGrid>
+                </MudForm>
+            }
+        </RMudItem>
+    </MudGrid>
+</div>
+
+@code {
+
+    private bool _IsVisible = false;
+
+#pragma warning disable BL0007
+    [Parameter]
+    public bool IsVisible
+    {
+        get => _IsVisible;
+        set
+        {
+            if (_IsVisible == value) return;
+            _IsVisible = value;
+            IsVisibleChanged.InvokeAsync(value);
+        }
+    }
+#pragma warning disable BL0007
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    private LoanApplicationApplyDto _model = new LoanApplicationApplyDto();
+
+#pragma warning disable BL0007
+    [Parameter]
+    public LoanApplicationApplyDto Model
+    {
+        get => _model;
+        set
+        {
+            if (_model == value) return;
+            _model = value;
+            ModelChanged.InvokeAsync(value);
+        }
+    }
+#pragma warning disable BL0007
+
+    [Parameter]
+    public EventCallback<LoanApplicationApplyDto> ModelChanged { get; set; }
+
+    [Parameter]
+    public SystemConfigurationDto SystemConfigurations { get; set; } = new SystemConfigurationDto();
+
+    [Parameter]
+    public string URLGUID { get; set; } = "";
+    MudForm form = new MudForm();
+
+    private LoanApplicationApplyDtoValidator validator = new LoanApplicationApplyDtoValidator();
+
+    private ProductDto? productDetails = new ProductDto();
+
+    private async Task CalculateQuote()
+    {
+        await form.Validate();
+
+        if (form.IsValid && Model != null)
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("ButtonText", "Yes");
+            parameters.Add("EventParameter", EventCallback.Factory.Create(this, Compute));
+            DialogOptions options = new DialogOptions() { CloseOnEscapeKey = true };
+            DialogService.Show<Confirmation>("Confirmation", parameters, options);
+
+            async Task Compute()
+            {
+                Snackbar.Add("Quote successfully computed", Severity.Success, config => { config.VisibleStateDuration = 1000; });
+                IsVisible = false;
+                await IsVisibleChanged.InvokeAsync(false);
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task SetProduct()
+    {
+        if ((Model.ProductId ?? 0) != 0)
+        {
+            string BaseAPIURL = _Configuration.GetSection("APIURL").Value ?? "";
+            string GetByURL = string.Concat(BaseAPIURL, $"/api/Product/GetById?Id={Model.ProductId}");
+            productDetails = await ApiService.Get<ProductDto>(GetByURL);
+
+            if (SystemConfigurations != null && productDetails != null)
+            {
+                SystemConfigurations.TermSliderMinMonths = productDetails.MinNoOfMonths;
+                if (Model.MonthlyTerm < productDetails.MinNoOfMonths)
+                {
+                    Model.MonthlyTerm = productDetails.MinNoOfMonths;
+                }
+                Model.InterestRate = productDetails.InterestRate;
+                Model.FirstNoOfMonthsInterestFree = productDetails.FirstNoOfMonthsInterestFree;
+            }
+
+            StateHasChanged();
+
+        }
+    }
+}

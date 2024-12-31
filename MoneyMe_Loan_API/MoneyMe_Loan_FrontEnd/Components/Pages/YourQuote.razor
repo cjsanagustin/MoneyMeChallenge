@@ -1,0 +1,291 @@
+﻿@using MoneyMe_Loan_FrontEnd.Components.Dialog
+@using MoneyMe_Loan_FrontEnd.Components.Dropdown
+@using MoneyMe_Loan_FrontEnd.Components.Fields
+@using MoneyMe_Loan_FrontEnd.Components.Wrapper
+@using MoneyMe_Loan_FrontEnd.DTOs
+@using MoneyMe_Loan_FrontEnd.Shared
+@using System.Globalization
+@inject ApiService ApiService
+@inject IConfiguration _Configuration;
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+
+<PageTitle>Your Quote</PageTitle>
+<div style="width:100%">
+    <MudGrid Justify="Justify.Center" Spacing="1">
+        <RMudItem Class="mud-elevation-2 pa-3 px-10" GridWidth="RMudItem.Grid.OneThird">
+            <MudGrid Justify="Justify.FlexStart" Spacing="1">
+                <RMudItem GridWidth="RMudItem.Grid.PopUp">
+                    <MudText Align="Align.Center" Typo="Typo.h4" Style="font-weight:700">Your quote</MudText>
+                </RMudItem>
+
+                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-5">
+                    <MudGrid Class="ma-0" Style="width:100%">
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                            <div class="d-flex justify-space-between">
+                                <MudText Typo="Typo.h6">Your information</MudText>
+                                <MudLink Typo="Typo.h6" OnClick="@(() => Edit())">Edit</MudLink>
+                            </div>
+                        </RMudItem>
+                    </MudGrid>
+                </RMudItem>
+
+                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-5">
+                    <MudGrid Class="ma-0" Style="width:100%">
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                            <div class="d-flex justify-space-between pa-1">
+                                <MudText Class="light-font">Name</MudText>
+                                <MudText Class="light-font">@string.Concat(Model.FirstName, " ", Model.LastName)</MudText>
+                            </div>
+                        </RMudItem>
+                    </MudGrid>
+                </RMudItem>
+
+                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-5">
+                    <MudGrid Class="ma-0" Style="width:100%">
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                            <div class="d-flex justify-space-between pa-1 @($"{(IsMobileNumberBlacklisted ? "blacklisted-field" : "")}")">
+                                <MudText Class="light-font">Mobile</MudText>
+                                <MudText Class="light-font">@Model.MobileNumber</MudText>
+                            </div>
+                        </RMudItem>
+                    </MudGrid>
+                </RMudItem>
+
+                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-5">
+                    <MudGrid Class="ma-0" Style="width:100%">
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                            <div class="d-flex justify-space-between pa-1 @($"{(IsDomainBlacklisted ? "blacklisted-field" : "")}")">
+                                <MudText Class="light-font">Email</MudText>
+                                <MudText Class="light-font">@Model.Email</MudText>
+                            </div>
+                        </RMudItem>
+                    </MudGrid>
+                </RMudItem>
+
+                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-13">
+                    <MudGrid Class="ma-0" Style="width:100%">
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                            <div class="d-flex justify-space-between pa-1">
+                                <MudText Typo="Typo.h6">Finance details</MudText>
+                                <MudLink Typo="Typo.h6" OnClick="@(() => Edit())">Edit</MudLink>
+                            </div>
+                        </RMudItem>
+                    </MudGrid>
+                </RMudItem>
+
+                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-8">
+                    <MudGrid Class="ma-0" Style="width:100%">
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                            <div class="d-flex justify-space-between pa-1">
+                                <MudText Class="light-font">Finance amount</MudText>
+                                <MudText Class="primary-font">@Utilities.GetDecimalFormat(Model.Amount)</MudText>
+                            </div>
+                        </RMudItem>
+                    </MudGrid>
+                </RMudItem>
+
+                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-5">
+                    <MudGrid Class="ma-0" Style="width:100%">
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                            <div class="d-flex justify-space-between pa-1">
+                                <div class="dashed-line-div" style="width:79%"></div>
+                                <MudText Class="">@string.Concat("over ", Model.MonthlyTerm, (Model.MonthlyTerm == 1 ? " month" : " months"))</MudText>
+                            </div>
+                        </RMudItem>
+                    </MudGrid>
+                </RMudItem>
+
+                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-8">
+                    <MudGrid Class="ma-0" Style="width:100%">
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                            <div class="d-flex justify-space-between pa-1">
+                                <MudText Class="light-font">Repayments from</MudText>
+                                <MudText Class="primary-font">@Utilities.GetDecimalFormat(Model.MonthlyPayment, 2)</MudText>
+                            </div>
+                        </RMudItem>
+                    </MudGrid>
+                </RMudItem>
+
+                <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 pt-5">
+                    <MudGrid Class="ma-0" Style="width:100%">
+                        <RMudItem GridWidth="RMudItem.Grid.PopUp" Class="pa-0 mt-n3">
+                            <div class="d-flex justify-space-between pa-1">
+                                <div class="dashed-line-div" style="width:87%"></div>
+                                <MudText Class="">Monthly</MudText>
+                            </div>
+                        </RMudItem>
+                    </MudGrid>
+                </RMudItem>
+
+                @if (validation != null && validation.ValidationMessages != null)
+                {
+                    if (!validation.IsValid)
+                    {
+                        <RMudItem Class="d-flex justify-center" GridWidth="RMudItem.Grid.PopUp">
+                            <MudText Class="red-font" Align="Align.Center" Typo="Typo.caption">
+                                @($"The provided {string.Join(" and ", validation.ValidationMessages.ToArray())} is on our blacklist and cannot be used.")
+                            </MudText>
+                        </RMudItem>
+                        <RMudItem Class="d-flex justify-center" GridWidth="RMudItem.Grid.PopUp">
+                            <MudText Class="red-font" Align="Align.Center" Typo="Typo.caption">
+                                @($"Please use a different {string.Join(" and ", validation.ValidationMessages.ToArray())} to proceed.")
+                            </MudText>
+                        </RMudItem>
+                    }
+                }
+
+                <RMudItem Class="d-flex justify-center" GridWidth="RMudItem.Grid.PopUp">
+                    <MudButton Class="button-shadow my-5 px-15" OnClick="@(() => ApplyNow())" Variant="Variant.Filled" Color="Color.Secondary">
+                        Apply now
+                    </MudButton>
+                </RMudItem>
+
+                <RMudItem Class="d-flex justify-center" GridWidth="RMudItem.Grid.PopUp">
+                    <MudText Align="Align.Center" Typo="Typo.caption" Style="width:75%">
+                        @string.Concat($"Total repayments {Utilities.GetDecimalFormat(Model.TotalRepayments, 2)}"
+                                 , ", made up of an", Model.EstablishmentFee > 0 ? $" establishment fee of {Utilities.GetDecimalFormat(Model.EstablishmentFee, 2)}," : ""
+                                 , $" interest of {Utilities.GetDecimalFormat(Model.TotalInterest, 2)} "
+                                 , "The repayment amount is based on the variables selected, is subject to our assessment and suitability, and other important terms and conditions apply."
+                                 )
+                    </MudText>
+                </RMudItem>
+               
+            </MudGrid>
+        </RMudItem>
+    </MudGrid>
+</div>
+
+@code {
+
+    private bool _IsVisible = false;
+
+#pragma warning disable BL0007
+    [Parameter]
+    public bool IsVisible
+    {
+        get => _IsVisible;
+        set
+        {
+            if (_IsVisible == value) return;
+            _IsVisible = value;
+            IsVisibleChanged.InvokeAsync(value);
+        }
+    }
+#pragma warning disable BL0007
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    private LoanApplicationApplyDto _model = new LoanApplicationApplyDto();
+
+    private bool IsMobileNumberBlacklisted
+    {
+        get
+        {
+            bool IsBlacklisted = false;
+            if (validation != null && validation.ValidationMessages != null)
+            {
+                if (validation.ValidationMessages.Any(x => x.ToLower().Equals("mobile number")))
+                {
+                    IsBlacklisted = true;
+                }
+            }
+            return IsBlacklisted;
+        }
+    }
+
+    private bool IsDomainBlacklisted
+    {
+        get
+        {
+            bool IsBlacklisted = false;
+            if (validation != null && validation.ValidationMessages != null)
+            {
+                if (validation.ValidationMessages.Any(x => x.ToLower().Equals("domain")))
+                {
+                    IsBlacklisted = true;
+                }
+            }
+            return IsBlacklisted;
+        }
+    }
+
+#pragma warning disable BL0007
+    [Parameter]
+    public LoanApplicationApplyDto Model
+    {
+        get => _model;
+        set
+        {
+            if (_model == value) return;
+            _model = value;
+            ModelChanged.InvokeAsync(value);
+        }
+    }
+#pragma warning disable BL0007
+
+    [Parameter]
+    public EventCallback<LoanApplicationApplyDto> ModelChanged { get; set; }
+
+    [Parameter]
+    public string URLGUID { get; set; } = "";
+
+    private ValidationMessageDto? validation = new ValidationMessageDto();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            string BaseAPIURL = _Configuration.GetSection("APIURL").Value ?? "";
+            string CalculateURL = string.Concat(BaseAPIURL, $"/api/money-me-loan-application/calculate-interest");
+            Model.MonthlyPayment = await ApiService.Post<decimal>(CalculateURL, Model);
+            StateHasChanged();
+        }
+    }
+
+    private async Task ApplyNow()
+    {
+
+        string BaseAPIURL = _Configuration.GetSection("APIURL").Value ?? "";
+        string ValidateURL = string.Concat(BaseAPIURL, $"/api/money-me-loan-application/check-blacklisted");
+
+        validation = await ApiService.Post<ValidationMessageDto>(ValidateURL, new LoanApplicationValidationDto
+            {
+                MobileNumber = Model.MobileNumber,
+                Email = Model.Email,
+            });
+
+        if (validation != null)
+        {
+            if (validation.IsValid)
+            {
+                var parameters = new DialogParameters();
+                parameters.Add("ButtonText", "Yes");
+                parameters.Add("EventParameter", EventCallback.Factory.Create(this, Apply));
+                DialogOptions options = new DialogOptions() { CloseOnEscapeKey = true };
+                DialogService.Show<Confirmation>("Confirmation", parameters, options);
+
+                async Task Apply()
+                {
+
+                    string BaseAPIURL = _Configuration.GetSection("APIURL").Value ?? "";
+                    string ApplyURL = string.Concat(BaseAPIURL, $"/api/money-me-loan-application/submit");
+                    await ApiService.Post<bool>(ApplyURL, Model);
+                    NavigationManager.NavigateTo($"/Success");
+
+                }
+
+            }
+        }
+
+    }
+
+    private async Task Edit()
+    {
+        IsVisible = true;
+        await IsVisibleChanged.InvokeAsync(true);
+        StateHasChanged();
+    }
+}

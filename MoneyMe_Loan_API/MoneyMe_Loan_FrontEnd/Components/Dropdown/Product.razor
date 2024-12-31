@@ -1,0 +1,107 @@
+﻿@using System.Linq.Expressions
+@using MoneyMe_Loan_FrontEnd.Components.Wrapper
+@using MoneyMe_Loan_FrontEnd.DTOs
+@using MoneyMe_Loan_FrontEnd.Shared
+@inject ApiService ApiService
+@inject IConfiguration _Configuration;
+
+<RMudItem GridWidth="@GridWidth" Class="@RMudItemClass" Style="@RMudItemStyle">
+    <MudSelect Class="@Class" Required="@Required" Clearable="Clearable" Dense="true" Margin="Margin.Dense" Label="Product"
+               Placeholder="--" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" For="@For"
+               T="string" @bind-Value="text" TextChanged="OnValueChanged">
+        @if (!string.IsNullOrEmpty(Label))
+        {
+            <MudSelectItem Value="string.Empty">@Label</MudSelectItem>
+        }
+        @{
+            if (data != null)
+            {
+                foreach (var item in data)
+                {
+                    <MudSelectItem Value="@(item.Description)" />
+                }
+            }
+        }
+    </MudSelect>
+</RMudItem>
+
+@code {
+    private List<ProductDto>? data = new List<ProductDto>();
+
+    [Parameter]
+    public EventCallback? ValueChangedEvent { get; set; }
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public bool Clearable { get; set; } = false;
+
+    [Parameter]
+    public RMudItem.Grid GridWidth { get; set; } = RMudItem.Grid.Whole;
+
+    [Parameter]
+    public string RMudItemClass { get; set; } = "pa-1";
+
+    [Parameter]
+    public string RMudItemStyle { get; set; } = "";
+
+    [Parameter]
+    public Expression<System.Func<string>>? For { get; set; }
+
+    private int? _value;
+
+#pragma warning disable BL0007
+    [Parameter]
+    public int? Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            _value = value;
+            ValueChanged.InvokeAsync(value);
+        }
+    }
+#pragma warning disable BL0007
+
+    [Parameter]
+    public EventCallback<int?> ValueChanged { get; set; }
+
+    private string text = "";
+    private bool firstLoad = false;
+
+    private async Task OnValueChanged(string value)
+    {
+        if (firstLoad)
+        {
+            var selected = data?.FirstOrDefault(x => x.Description.Equals(value));
+            await ValueChanged.InvokeAsync(selected?.Id);
+        }
+
+        if (ValueChangedEvent.HasValue)
+        {
+            await ValueChangedEvent.Value.InvokeAsync();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            string BaseAPIURL = _Configuration.GetSection("APIURL").Value ?? "";
+            string URL = string.Concat(BaseAPIURL, "/api/Product/GetAll");
+            data = await ApiService.Get<List<ProductDto>>(URL);
+            text = data?.FirstOrDefault(x => x.Id == Value)?.Description ?? "";
+            firstLoad = true;
+            StateHasChanged();
+        }
+    }
+
+}

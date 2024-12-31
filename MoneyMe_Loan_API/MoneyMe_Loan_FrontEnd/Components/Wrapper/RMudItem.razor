@@ -1,0 +1,119 @@
+﻿@* Responsive MudItem Wrapper *@
+
+<MudItem xs="12" sm="@sm" md="@md" lg="@lg" Class="@Class" Style="@Style">
+    @ChildContent
+</MudItem>
+
+@code {
+    [Parameter]
+    public string Class { get; set; } = "pa-1";
+
+    [Parameter]
+    public string Style { get; set; } = "";
+
+    [Parameter]
+    public Grid GridWidth { get; set; } = Grid.Whole;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    public enum Grid
+    {
+        CheckboxSmall,
+        Checkbox,
+        Whole,
+        OneHalf,
+        OneThird,
+        PopUp
+    }
+
+    public int lg
+    {
+        get
+        {
+            int val = 3;
+            switch (GridWidth)
+            {
+                case Grid.CheckboxSmall:
+                    val = 1;
+                    break;
+                case Grid.Checkbox:
+                    val = 2;
+                    break;
+                case Grid.Whole:
+                    val = 3;
+                    break;
+                case Grid.OneHalf:
+                    val = 4;
+                    break;
+                case Grid.OneThird:
+                    val = 6;
+                    break;
+                case Grid.PopUp:
+                    val = 12;
+                    break;
+            }
+            return val;
+        }
+    }
+
+    public int md
+    {
+        get
+        {
+            int val = 4;
+            switch (GridWidth)
+            {
+                case Grid.CheckboxSmall:
+                    val = 2;
+                    break;
+                case Grid.Checkbox:
+                    val = 3;
+                    break;
+                case Grid.Whole:
+                    val = 4;
+                    break;
+                case Grid.OneHalf:
+                    val = 6;
+                    break;
+                case Grid.OneThird:
+                    val = 8;
+                    break;
+                case Grid.PopUp:
+                    val = 12;
+                    break;
+            }
+            return val;
+        }
+    }
+
+    public int sm
+    {
+        get
+        {
+            int val = 12;
+            switch (GridWidth)
+            {
+                case Grid.CheckboxSmall:
+                    val = 3;
+                    break;
+                case Grid.Checkbox:
+                    val = 4;
+                    break;
+                case Grid.Whole:
+                    val = 6;
+                    break;
+                case Grid.OneHalf:
+                    val = 8;
+                    break;
+                case Grid.OneThird:
+                    val = 10;
+                    break;
+                case Grid.PopUp:
+                    val = 12;
+                    break;
+            }
+            return val;
+        }
+    }
+}

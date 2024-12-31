@@ -1,0 +1,12 @@
+﻿@page "/notfound"
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject NavigationManager navManager
+@inject ProtectedLocalStorage _sessionStorage
+
+<PageTitle>Page Not Found</PageTitle>
+<MudPaper Class="d-flex flex-column justify-center pb-10" Style="height:88vh">
+    <span class="d-flex justify-center">
+        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" Size="Size.Large" Style="font-size: 6rem;"></MudIcon>
+    </span>
+    <MudText Typo="Typo.h4" Class="d-flex justify-center">Page Not Found</MudText>
+</MudPaper>

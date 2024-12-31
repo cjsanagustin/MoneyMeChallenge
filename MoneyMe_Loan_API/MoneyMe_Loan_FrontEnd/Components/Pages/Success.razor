@@ -1,0 +1,28 @@
+﻿@page "/Success"
+@using MoneyMe_Loan_FrontEnd.DTOs
+@using MoneyMe_Loan_FrontEnd.Shared
+@using System.Globalization
+@inject IConfiguration _Configuration;
+@inject ApiService ApiService
+
+
+<PageTitle>Success</PageTitle>
+<MudPaper Class="d-flex flex-column justify-center pb-10" Style="height:88vh">
+    <span class="d-flex justify-center">
+        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Large" Style="font-size: 6rem;"></MudIcon>
+    </span>
+    <MudText Typo="Typo.h6" Class="d-flex justify-center">Success! Your Loan Application Has Been Submitted</MudText>
+    <MudText Typo="Typo.body2" Class="d-flex justify-center pt-5">
+        Thank you for applying with us. Your loan application has been successfully submitted.
+    </MudText>
+    <MudText Typo="Typo.body2" Class="d-flex justify-center">
+        A confirmation receipt has been sent to your registered email address.
+    </MudText>
+    <MudText Typo="Typo.body2" Class="d-flex justify-center">
+        Please check your inbox for further details.
+    </MudText>
+    <MudText Typo="Typo.body2" Class="d-flex justify-center pt-5">
+        If you have any questions or need assistance, feel free to contact our support team.
+    </MudText>
+
+</MudPaper>
