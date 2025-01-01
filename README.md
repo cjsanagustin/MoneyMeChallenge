@@ -25,7 +25,7 @@ List the projects that need to be run:
 1. **Backend Service**: Located in `..\MoneyMeChallenge\MoneyMe_Loan_API\MoneyMe_Loan_API`.
    - Run `dotnet run` in the backend directory.
 2. **Frontend**: Located in `..\MoneyMeChallenge\MoneyMe_Loan_API\MoneyMe_Loan_FrontEnd`.
-   - Run `dotnet run` and `npm start` in the frontend directory.
+   - Run `dotnet run` in the frontend directory.
 
 
 ## API Endpoints for third party apps
